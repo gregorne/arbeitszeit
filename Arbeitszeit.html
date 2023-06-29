@@ -27,6 +27,11 @@
         padding-bottom: 8rem;
       }
 
+      div.ergebnis > .selected {
+        border-radius: 1rem;
+        outline: solid hsla(217, 97%, 88%, 0.342) 0.3rem;
+      }
+
       div.start {
         margin-top: -5rem;
       }
@@ -79,15 +84,23 @@
       <div
         class="d-flex justify-content-evenly min-vw-100 position-absolute bottom-0 ergebnis fs-1 fw-bold"
       >
-        <div id="8hclick">
+        <div id="4hclick" class="px-3 py-1">
+          <span id="4h">00:00</span>
+          <p class="fs-6 text-center text-opacity-25 text-secondary">4h</p>
+        </div>
+        <div id="6hclick" class="px-3 py-1">
+          <span id="6h">00:00</span>
+          <p class="fs-6 text-center text-opacity-25 text-secondary">6h</p>
+        </div>
+        <div id="8hclick" class="px-3 py-1">
           <span id="8h">00:00</span>
           <p class="fs-6 text-center text-opacity-25 text-secondary">8h</p>
         </div>
-        <div id="8h30click">
+        <div id="8h30click" class="px-3 py-1">
           <span id="8h30">00:00</span>
           <p class="fs-6 text-center text-opacity-25 text-secondary">8h30</p>
         </div>
-        <div id="10hclick">
+        <div id="10hclick" class="px-3 py-1">
           <span id="10h">00:00</span>
           <p class="fs-6 text-center text-opacity-25 text-secondary">10h</p>
         </div>
@@ -108,23 +121,29 @@
         input.value.substr(0, 2) * 60 + Number(input.value.substr(3, 2));
       input.value = output(localStorage.getItem("input"), "full");
 
+      const end4h = document.getElementById("4h");
+      const end6h = document.getElementById("6h");
       const end8h = document.getElementById("8h");
       const end8h30 = document.getElementById("8h30");
       const end10h = document.getElementById("10h");
 
+      const end4h_click = document.getElementById("4hclick");
+      const end6h_click = document.getElementById("6hclick");
       const end8h_click = document.getElementById("8hclick");
       const end8h30_click = document.getElementById("8h30click");
       const end10h_click = document.getElementById("10hclick");
 
       var min, normal, max;
+      var ende = [];
       var timer = normal;
+      //timer_flag: 0=4h, 1=6h, 2=8h, 3=8h30, 4=10h
       var timer_flag = 1;
 
       time = input.value.substr(0, 2) * 60 + Number(input.value.substr(3, 2));
       localStorage.setItem("input", time);
       calculate();
       startTimer();
-      timer = normal;
+      timer = ende[3];
       updateTimer();
 
       input.addEventListener(
@@ -135,16 +154,33 @@
           localStorage.setItem("input", time);
           calculate();
           startTimer();
-          timer = normal;
+          timer = ende[3];
           updateTimer();
         },
         false
       );
 
+      end4h_click.addEventListener(
+        "click",
+        () => {
+          timer = ende[0];
+          setAsSelected(end4h_click);
+        },
+        false
+      );
+      end6h_click.addEventListener(
+        "click",
+        () => {
+          timer = ende[1];
+          setAsSelected(end6h_click);
+        },
+        false
+      );
       end8h_click.addEventListener(
         "click",
         () => {
-          timer = min;
+          timer = ende[2];
+          setAsSelected(end8h_click);
         },
         false
       );
@@ -152,7 +188,8 @@
       end8h30_click.addEventListener(
         "click",
         () => {
-          timer = normal;
+          timer = ende[3];
+          setAsSelected(end8h30_click);
         },
         false
       );
@@ -160,42 +197,46 @@
       end10h_click.addEventListener(
         "click",
         () => {
-          timer = max;
+          timer = ende[4];
+          setAsSelected(end10h_click);
         },
         false
       );
 
       function startTimer() {
+        //startet den Timer im Hintergrund
         setInterval(function () {
           updateTimer();
         }, 200);
       }
 
-      function switchTimer() {
-        switch (timer_flag) {
-          case 0:
-            timer = min;
-            break;
-          case 1:
-            timer = normal;
-            break;
-          case 2:
-            timer = max;
-            break;
-        }
+      function setAsSelected(item) {
+        //entfernt die .selected klasse von allen elementen die diese haben und setzt bei "item" die .selected klasse
+        var elems = document.querySelectorAll(".selected");
+
+        [].forEach.call(elems, function (el) {
+          el.classList.remove("selected");
+        });
+        item.classList.add("selected");
       }
 
       function calculate() {
-        min = time + 510;
-        normal = time + 540;
-        max = time + 645;
+        //berechnet die end zeiten (Zeit in minuten)
+        ende[0] = time + 240;
+        ende[1] = time + 360;
+        ende[2] = time + 510;
+        ende[3] = time + 540;
+        ende[4] = time + 645;
 
-        end8h.innerText = output(min, "full");
-        end8h30.innerText = output(normal, "full");
-        end10h.innerText = output(max, "full");
+        end4h.innerText = output(ende[0], "full");
+        end6h.innerText = output(ende[1], "full");
+        end8h.innerText = output(ende[2], "full");
+        end8h30.innerText = output(ende[3], "full");
+        end10h.innerText = output(ende[4], "full");
       }
 
       function updateTimer() {
+        //updated den timer im Hintergrund (berechnet differenz zwischen jetzt und end Zeit)
         var now = new Date();
         now = now.getHours() * 60 + now.getMinutes();
         var res = timer - now;
@@ -205,6 +246,8 @@
       }
 
       function output(val, format) {
+        //gibt den Zeitwert(val) im angegebenen (format) zurück
+        //mögliche formate: "h", "m", "full"
         var hours = ("0" + parseInt(val / 60)).slice(-2);
         var minutes = ("0" + (val % 60)).slice(-2);
 
