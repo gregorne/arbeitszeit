@@ -27,9 +27,15 @@
         padding-bottom: 8rem;
       }
 
+      div.ergebnis > div {
+        border-bottom: solid hsla(0, 0%, 100%, 0) 0.3rem;
+      }
+
       div.ergebnis > .selected {
-        border-radius: 1rem;
-        outline: solid hsla(217, 97%, 88%, 0.342) 0.3rem;
+        /* border-radius: 1rem;
+        outline: solid hsla(217, 97%, 88%, 0.342) 0.3rem; */
+        border-bottom: solid hsla(218, 97%, 88%, 0.438) 0.3rem;
+        padding-bottom: -2rem;
       }
 
       div.start {
@@ -62,54 +68,39 @@
   </head>
 
   <body>
-    <div
-      class="d-flex flex-column align-items-center justify-content-center min-vh-100"
-    >
+    <div class="d-flex flex-column align-items-center justify-content-center min-vh-100">
       <div class="d-flex flex-column justify-content-start fw-bold start">
         <div class="d-flex flex-column justify-content-center p-2 pb-5">
-          <label
-            for="inputStartTime"
-            class="form-label text-info text-center mb-0"
-            >Anfangszeit:</label
-          >
-          <input
-            type="time"
-            class="form-control text-center fs-2 fw-bold border-0 text-secondary bg-transparent"
-            id="inputStartTime"
-            value="00:00"
-          />
+          <label for="inputStartTime" class="form-label text-info text-center mb-0">Anfangszeit:</label>
+          <input type="time" class="form-control text-center fs-2 fw-bold border-0 text-secondary bg-transparent" id="inputStartTime" value="00:00" />
         </div>
       </div>
 
-      <div
-        class="d-flex justify-content-evenly min-vw-100 position-absolute bottom-0 ergebnis fs-1 fw-bold"
-      >
-        <div id="4hclick" class="px-3 py-1">
+      <div class="d-flex justify-content-evenly min-vw-100 position-absolute bottom-0 ergebnis fs-1 fw-bold">
+        <div id="4hclick">
           <span id="4h">00:00</span>
-          <p class="fs-6 text-center text-opacity-25 text-secondary">4h</p>
+          <p class="fs-6 text-center text-opacity-25 text-secondary mb-1">4h</p>
         </div>
-        <div id="6hclick" class="px-3 py-1">
+        <div id="6hclick">
           <span id="6h">00:00</span>
-          <p class="fs-6 text-center text-opacity-25 text-secondary">6h</p>
+          <p class="fs-6 text-center text-opacity-25 text-secondary mb-1">6h</p>
         </div>
-        <div id="8hclick" class="px-3 py-1">
+        <div id="8hclick">
           <span id="8h">00:00</span>
-          <p class="fs-6 text-center text-opacity-25 text-secondary">8h</p>
+          <p class="fs-6 text-center text-opacity-25 text-secondary mb-1">8h</p>
         </div>
-        <div id="8h30click" class="px-3 py-1">
+        <div id="8h30click">
           <span id="8h30">00:00</span>
-          <p class="fs-6 text-center text-opacity-25 text-secondary">8h30</p>
+          <p class="fs-6 text-center text-opacity-25 text-secondary mb-1">8h30</p>
         </div>
-        <div id="10hclick" class="px-3 py-1">
+        <div id="10hclick">
           <span id="10h">00:00</span>
-          <p class="fs-6 text-center text-opacity-25 text-secondary">10h</p>
+          <p class="fs-6 text-center text-opacity-25 text-secondary mb-1">10h</p>
         </div>
       </div>
     </div>
 
-    <div
-      class="timer text-center position-fixed top-50 start-50 translate-middle d-flex"
-    >
+    <div class="timer text-center position-fixed top-50 start-50 translate-middle d-flex">
       <span id="timer_h" class="hours text-secondary">00</span>
       <span class="text-secondary doppelpunkt">:</span>
       <span id="timer_m" class="minutes text-secondary">00</span>
@@ -117,8 +108,7 @@
 
     <script>
       const input = document.getElementById("inputStartTime");
-      var time =
-        input.value.substr(0, 2) * 60 + Number(input.value.substr(3, 2));
+      var time = input.value.substr(0, 2) * 60 + Number(input.value.substr(3, 2));
       input.value = output(localStorage.getItem("input"), "full");
 
       const end4h = document.getElementById("4h");
@@ -133,24 +123,25 @@
       const end8h30_click = document.getElementById("8h30click");
       const end10h_click = document.getElementById("10hclick");
 
-      var min, normal, max;
       var ende = [];
-      var timer = normal;
-      //timer_flag: 0=4h, 1=6h, 2=8h, 3=8h30, 4=10h
-      var timer_flag = 1;
 
+      //init
       time = input.value.substr(0, 2) * 60 + Number(input.value.substr(3, 2));
       localStorage.setItem("input", time);
       calculate();
       startTimer();
-      timer = ende[3];
+      timer = loadTimer();
       updateTimer();
+      setAsSelected(end8h30_click);
+      //wenn Auswahl im localStorage gespeichert ist, diese als ausgewählt setzen
+      if (!(localStorage.getItem("selected") === null)) {
+        setAsSelected(loadSelected());
+      }
 
       input.addEventListener(
         "input",
         () => {
-          time =
-            input.value.substr(0, 2) * 60 + Number(input.value.substr(3, 2));
+          time = input.value.substr(0, 2) * 60 + Number(input.value.substr(3, 2));
           localStorage.setItem("input", time);
           calculate();
           startTimer();
@@ -165,6 +156,8 @@
         () => {
           timer = ende[0];
           setAsSelected(end4h_click);
+          saveSelected(end4h_click);
+          saveTimer();
         },
         false
       );
@@ -173,6 +166,8 @@
         () => {
           timer = ende[1];
           setAsSelected(end6h_click);
+          saveSelected(end6h_click);
+          saveTimer();
         },
         false
       );
@@ -181,6 +176,8 @@
         () => {
           timer = ende[2];
           setAsSelected(end8h_click);
+          saveSelected(end8h_click);
+          saveTimer();
         },
         false
       );
@@ -190,6 +187,8 @@
         () => {
           timer = ende[3];
           setAsSelected(end8h30_click);
+          saveSelected(end8h30_click);
+          saveTimer();
         },
         false
       );
@@ -199,6 +198,8 @@
         () => {
           timer = ende[4];
           setAsSelected(end10h_click);
+          saveSelected(end10h_click);
+          saveTimer();
         },
         false
       );
@@ -208,6 +209,22 @@
         setInterval(function () {
           updateTimer();
         }, 200);
+      }
+
+      function saveSelected(item) {
+        item = localStorage.setItem("selected", item.id);
+      }
+
+      function loadSelected() {
+        var selected = localStorage.getItem("selected");
+        return document.getElementById(selected);
+      }
+
+      function saveTimer() {
+        localStorage.setItem("timer", timer);
+      }
+      function loadTimer() {
+        return localStorage.getItem("timer");
       }
 
       function setAsSelected(item) {
