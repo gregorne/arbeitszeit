@@ -1,4 +1,5 @@
 # arbeitszeit
 
 
-![image](https://github.com/gregorne/arbeitszeit/assets/27886137/3ccf2278-9233-4db8-ad95-d6c21431b345)
+![image](https://github.com/gregorne/arbeitszeit/assets/27886137/18cc790f-e451-4a46-9d93-81bf23aa68c8)
+
