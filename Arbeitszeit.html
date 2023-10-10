@@ -143,9 +143,31 @@
         () => {
           time = input.value.substr(0, 2) * 60 + Number(input.value.substr(3, 2));
           localStorage.setItem("input", time);
+          selectedItem = localStorage.getItem("selected");
           calculate();
-          startTimer();
+          switch (selectedItem) {
+            case "4hclick":
+              timer = ende[0];
+              timer;
+              break;
+            case "6hclick":
+              timer = ende[1];
+              break;
+            case "8hclick":
+              timer = ende[2];
+              break;
+            case "8h30click":
+              timer = ende[3];
+              break;
+            case "10hclick":
+              timer = ende[4];
+              break;
+            default:
+              console.log("default switch");
+              break;
+          }
           updateTimer();
+          saveTimer();
         },
         false
       );
